@@ -68,7 +68,7 @@ export function companySheet(s, data) {
 
 export function worldSheet(s, data) {
   const p = s.player, W = s.world, can = s.phase === 'act' && s.ap > 0;
-  const bar = (ic, v, hot) => `<span class="bar ${hot ? 'hot' : ''}">${icon(ic)}<i><b style="width:${v}%"></b></i></span>`;
+  const bar = (ic, v, hot) => `<span class="mtr ${hot ? 'hot' : ''}">${icon(ic)}<i><b style="width:${v}%"></b></i></span>`;
   const go = (P, d) => `<button class="go" data-act="nego" data-who="${P.id}" data-deal="${d}" ${off(can && !dealErr(s, data, P, d))}>${icon('deal')}</button>`;
   const regions = data.regions.map((r, i) => {
     const w = W.regions[r.id], pol = s.policies.reduce((a, x) => (x.r === r.id && x.until >= s.day ? a * x.v : a), 1);
@@ -91,7 +91,7 @@ export function worldSheet(s, data) {
   ${s.rewrites.length ? `<h4>${icon('pen')}${s.rewrites.length}</h4>${rewrites(s)}` : ''}`;
 }
 
-export const rewrites = s => `<ol class="rew">${s.rewrites.slice().reverse().map(r => `<li><span class="num">${r.day}</span>${r.title}</li>`).join('')}</ol>`;
+export const rewrites = (s, old) => `<ol class="rew">${(old ? s.rewrites : s.rewrites.slice().reverse()).map(r => `<li><span class="num">${r.day}</span>${r.title}</li>`).join('')}</ol>`;
 
 export function npcSheet(s, data, id) {
   const d = data.npcs.find(x => x.id === id), n = s.npcs[id], p = s.player, c = data.config;

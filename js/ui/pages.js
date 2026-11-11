@@ -14,9 +14,9 @@ export const startHTML = data => `<article class="paper start">
 
 export function deskHTML(s, data) {
   const p = s.player, c = data.config;
-  const stat = (ic, v) => `<span class="stat">${icon(ic)}<b class="num">${v}</b></span>`;
+  const stat = (ic, v, cls = '') => `<span class="stat ${cls}">${icon(ic)}<b class="num">${v}</b></span>`;
   return `<div class="desk">
-  <header class="bar">${stat('cash', p.cash)}${p.status === 'out' ? stat('user', '—') : stat('control', p.control + '%')}${stat('fame', p.fame)}${stat('day', s.day + '/' + c.days)}</header>
+  <header class="bar">${stat('cash', p.cash)}${p.status === 'out' ? stat('user', '—', 'neg') : stat('control', p.control + '%', p.status === 'holder' ? 'neg' : '')}${stat('fame', p.fame)}${stat('day', s.day + '/' + c.days)}</header>
   ${boardHTML(s, data)}
   ${handHTML(s, data)}
   <footer class="dock">
@@ -32,7 +32,7 @@ export function overHTML(s, data) {
   <header class="mast"><h1>终刊</h1><div class="dateline"><span>第 ${r.day} 天</span><span>${s.player.name}</span></div></header>
   <h2 class="head ${r.win ? 'mine' : ''}">${icon(r.win ? 'worth' : r.quit ? 'stab' : 'end')}<span class="num">${r.worth}</span></h2>
   <ol class="rank">${rank.map(x => `<li class="${x.me ? 'mine' : ''}"><span>${x.name}</span><b class="num">${x.worth}</b></li>`).join('')}</ol>
-  ${s.rewrites.length ? `<h3 class="left">${icon('pen')}你留下的世界</h3>${rewrites(s)}` : ''}
+  ${s.rewrites.length ? `<h3 class="left">${icon('pen')}你留下的世界</h3>${rewrites(s, true)}` : ''}
   <button class="primary wide" data-act="reset">${icon('new')}新局</button>
 </article>`;
 }
