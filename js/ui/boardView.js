@@ -8,7 +8,7 @@ export function boardHTML(s, data) {
   const p = s.player, ridx = id => data.regions.findIndex(r => r.id === id);
   const tiles = data.config.board.map((t, i) => {
     const [row, col] = at(i), r = t.startsWith('reg:') ? t.slice(4) : null;
-    const cls = r ? `t-reg r${ridx(r)} ${s.world.regions[r].unrest >= s.day ? 'unrest' : ''}` : 't-' + t;
+    const cls = r ? `t-reg r${ridx(r)} ${Math.max(s.world.regions[r].unrest, s.world.regions[r].ban) >= s.day ? 'unrest' : ''}` : 't-' + t;
     return `<div class="tile ${cls} ${i === p.pos ? 'here' : ''}" style="grid-area:${row}/${col}">${icon(r ? 'reg' : t)}${
       r && p.sites[r] ? `<i class="n">${p.sites[r]}</i>` : ''}${i === p.pos ? '<b class="me"></b>' : ''}</div>`;
   }).join('');

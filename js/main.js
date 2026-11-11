@@ -4,11 +4,15 @@ import { step } from './engine/day.js';
 import { clear, load, parse, save, serialize } from './engine/save.js';
 import { paperHTML } from './ui/paperView.js';
 import { deskHTML, overHTML, startHTML } from './ui/pages.js';
-import { cardSheet, companySheet, eventSheet, menuSheet } from './ui/sheets.js';
+import { cardSheet, companySheet, eventSheet, negoSheet, npcSheet, worldSheet } from './ui/sheets.js';
 
 const $ = q => document.querySelector(q);
-const FILES = ['config', 'cards', 'events', 'dilemmas', 'regions', 'industries', 'headlines'];
-const MSG = { ap: '行动点不足', cash: '现金不足', weak: '等级不够', target: '今天没有危机', hand: '先弃牌', none: '没有可变的牌', region: '选一个地区' };
+const FILES = ['config', 'cards', 'events', 'dilemmas', 'regions', 'industries', 'headlines', 'npcs', 'people', 'world'];
+const MSG = {
+  ap: '行动点不足', cash: '现金不足', weak: '等级不够', target: '现在用不上', hand: '先弃牌', none: '没有可用的', region: '选一个地区',
+  status: '这个身份做不了', active: '已在生效', small: '估值不够', cool: '刚谈过', control: '持股太少', max: '已到上限', nosite: '那里没有厂', ban: '被禁入', chip: '先选筹码',
+};
+const WHO = { ceo: '重掌公司', holder: '被罢免', out: '一无所有' };
 const clean = t => String(t || '').replace(/[<>&"']/g, '').trim().slice(0, 8);
 let data, state = null, sheet = null, timer;
 
@@ -29,7 +33,9 @@ function render() {
   const html = !live ? '' : state.pending ? eventSheet(state, data)
     : !sheet ? '' : sheet.type === 'card' ? cardSheet(state, data, sheet.from, sheet.i)
     : sheet.type === 'co' ? companySheet(state, data)
-    : sheet.type === 'menu' ? menuSheet(state) : paperHTML(state, data, false);
+    : sheet.type === 'world' ? worldSheet(state, data)
+    : sheet.type === 'npc' ? npcSheet(state, data, sheet.id)
+    : sheet.type === 'nego' ? negoSheet(state, data, sheet) : paperHTML(state, data, false);
   const el = $('#sheet');
   el.innerHTML = html ? `<div class="back" ${state.pending ? '' : 'data-act="close"'}></div><div class="panel">${html}</div>` : '';
   el.hidden = !html;
@@ -38,11 +44,14 @@ function render() {
 function dispatch(a, keep) {
   const r = step(state, a, data), e = r.log.find(l => l.type === 'error');
   if (e) return toast(MSG[e.msg] || e.msg);
+  const moved = r.log.find(l => l.type === 'status'), deal = r.log.find(l => l.type === 'deal');
   state = r.state;
-  if (!keep) sheet = null;
+  if (deal && !deal.ok) sheet.pick = []; // 没谈成：留在桌边，看看摸到了什么底
+  else if (!keep || moved || deal) sheet = null;
+  if (moved || deal) toast(moved ? WHO[moved.to] : deal.ok ? '谈成' : '没谈成');
   persist();
   render();
-  window.scrollTo(0, 0);
+  if (!sheet) window.scrollTo(0, 0);
 }
 
 document.addEventListener('click', ev => {
@@ -65,7 +74,19 @@ document.addEventListener('click', ev => {
     case 'play': dispatch({ type: 'play', from: sheet.from, i: sheet.i, arg: d.arg }); break;
     case 'discard': dispatch({ type: 'discard', i: sheet.i }); break;
     case 'sell': dispatch({ type: 'sell', r: d.r }, true); break;
-    case 'paper': case 'co': case 'menu': sheet = { type: d.act }; render(); break;
+    case 'paper': case 'co': case 'world': sheet = { type: d.act }; render(); break;
+    case 'npc': sheet = { type: 'npc', id: d.id }; render(); break;
+    case 'nego': sheet = { type: 'nego', who: d.who, deal: d.deal, arg: d.arg, pick: [] }; render(); break;
+    case 'chip': { // 最多两项，第三项顶掉最早的
+      const k = sheet.pick.indexOf(d.id);
+      if (k >= 0) sheet.pick.splice(k, 1); else sheet.pick = [...sheet.pick, d.id].slice(-2);
+      render();
+      break;
+    }
+    case 'deal': dispatch({ type: 'nego', who: sheet.who, deal: sheet.deal, arg: sheet.arg, chips: sheet.pick }, true); break;
+    case 'stake': dispatch({ type: 'stake', id: d.id, n: +d.n }, true); break;
+    case 'short': dispatch({ type: 'short', id: d.id }, true); break;
+    case 'quit': if (confirm('放弃这一局？')) { sheet = null; dispatch({ type: 'quit' }); } break;
     case 'close': sheet = null; render(); break;
     case 'export': {
       const a = document.createElement('a');
@@ -76,10 +97,7 @@ document.addEventListener('click', ev => {
       break;
     }
     case 'import': $('#file').click(); break;
-    case 'reset':
-      if (state.phase !== 'over' && !confirm('放弃当前这一局？')) break;
-      state = null; sheet = null; persist(); render();
-      break;
+    case 'reset': state = null; sheet = null; persist(); render(); break;
   }
 });
 

@@ -7,7 +7,7 @@ const num = v => (v > 0 ? '+' : '') + v;
 // 把 fx 画成「图标 + 数字」
 export function chips(fx = {}, data, lvl) {
   const out = [], add = (ic, v, good) => out.push(`<span class="chip ${good ? 'pos' : 'neg'}">${icon(ic)}${v}</span>`);
-  const nm = (list, k) => (k === '$self' || k === '$here' ? '' : list.find(x => x.id === k)?.name || '');
+  const nm = (list, k) => (k[0] === '$' ? '' : list.find(x => x.id === k)?.name || '');
   if (fx.suppress) add('ledger', 'Lv' + lvl, 1);
   if (fx.resolve) add('ok', 'Lv' + lvl, 1);
   if (fx.cash) add('cash', num(fx.cash), fx.cash > 0);
@@ -21,7 +21,9 @@ export function chips(fx = {}, data, lvl) {
   if (fx.reveal) add('eye', fx.reveal, 1);
   for (const [k, v] of Object.entries(fx.boom || {})) add(v > 0 ? 'up' : 'down', nm(data.industries, k) + num(v), v > 0);
   for (const [k, v] of Object.entries(fx.reg || {})) add('law', nm(data.industries, k) + num(v), v < 0);
-  for (const [k, v] of Object.entries(fx.stab || {})) add('reg', nm(data.regions, k) + num(v), v > 0);
+  for (const [k, v] of Object.entries(fx.stab || {})) add('stab', nm(data.regions, k) + num(v), v > 0);
+  for (const [k, v] of Object.entries(fx.acc || {})) add('acc', nm(data.regions, k) + num(v), v > 0);
+  if (fx.restart) add('new', '', 1);
   if (fx.favor) add('net', '…', 0);
   return out.join('');
 }

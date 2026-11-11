@@ -1,26 +1,27 @@
-// 格子事件、抉择、宏观事件、延迟后果。
+// 格子事件、抉择、宏观事件、延迟后果。NPC 行动与世界事件在 npc.js / world.js，由 day.js 依次调用。
 import { chance, int, pick, weighted } from './rng.js';
 import { applyFx } from './world.js';
 
 const opt = (l, fx = {}, x = {}) => ({ l, fx, ...x });
 
-// 落在格子上：生成一个待处理事件 s.pending
+// 落在格子上：生成一个待处理事件 s.pending。不在 CEO 位置上时，公司的事轮不到你，只有私事。
 export function land(s, data) {
-  const c = data.config, p = s.player, tile = c.board[p.pos], E = data.events;
-  if (tile.startsWith('reg:')) {
-    const r = tile.slice(4);
+  const c = data.config, p = s.player, tile = c.board[p.pos], E = data.events, ceo = p.status === 'ceo';
+  if (tile === 'rest') { s.pending = { k: 'rest', t: '休息', opts: [opt('ok', { draw: 1 })] }; return; }
+  if (ceo && tile.startsWith('reg:')) {
+    const r = tile.slice(4), ban = s.world.regions[r].ban >= s.day;
     s.pending = {
       k: 'region', t: data.regions.find(x => x.id === r).name, region: r,
       opts: [
-        opt('build', { cash: -c.site.cost, site: 1, acc: { $here: 2 } }, { news: 'build' }),
-        ...(p.sites[r] ? [opt('sell', { cash: c.site.sell, site: -1 }, { news: 'sell' })] : []),
+        ...(ban ? [] : [opt('build', { cash: -c.site.cost, site: 1, acc: { $here: 2 } }, { news: 'build' })]),
+        ...(p.sites[r] ? [opt('sell', { cash: c.site.sell, site: -1, ...c.site.leave }, { news: 'sell' })] : []),
         opt('pass'),
       ],
     };
     return;
   }
-  if (tile === 'rest') { s.pending = { k: 'rest', t: '休息', opts: [opt('ok', { draw: 1 })] }; return; }
-  const ev = tile === 'dil' ? pick(s, data.dilemmas) : weighted(s, tile === 'ind' ? E.ind[p.industry] : E.gen, e => e.p ?? 10);
+  const ev = tile === 'dil' ? pick(s, data.dilemmas)
+    : weighted(s, !ceo ? E.life : tile === 'ind' ? E.ind[p.industry] : E.gen, e => e.p ?? 10);
   s.pending = ev.k === 'crisis'
     ? { k: 'crisis', t: ev.t, d: ev.d, lvl: ev.lvl, fx: ev.fx, opts: [opt('ok')] }
     : { k: ev.opts ? 'choice' : 'instant', t: ev.t, d: ev.d, w: ev.w, opts: ev.opts || [opt('ok', ev.fx)] };
@@ -53,11 +54,12 @@ export function night(s, data) {
       p.cash -= n;
       s.news.push({ k: 'pol', r: q.r, n, w: 8, mine: n > 0 });
     } else if (q.k === 'reg') {
-      const I = W.industries[q.i], hit = q.i === p.industry, safe = p.shield >= s.day;
+      const I = W.industries[q.i], hit = q.i === p.industry, safe = hit && p.shield >= s.day;
       I.regulation += c.reg.up;
       I.boom -= c.reg.boom;
-      if (hit && !safe) { p.cash -= c.reg.fine; p.fame -= c.reg.fame; }
-      s.news.push({ k: hit && safe ? 'regSafe' : 'reg', i: q.i, n: c.reg.fine, w: 8, mine: hit });
+      if (hit && !safe && p.status === 'ceo') { p.cash -= c.reg.fine; p.fame -= c.reg.fame; s.strike++; }
+      for (const d of data.npcs) if (d.industry === q.i) s.npcs[d.id].val = Math.round(s.npcs[d.id].val * (1 - c.reg.npc)); // NPC 也跟着倒霉
+      s.news.push({ k: hit && safe ? 'regSafe' : 'reg', i: q.i, n: c.reg.fine, w: 8, mine: hit && p.status === 'ceo' });
     } else if (q.k === 'favor') {
       s.inbox.push({
         k: 'favor', t: q.who + '来电', d: '上次的忙，该还了。',
@@ -73,7 +75,7 @@ export function night(s, data) {
   }
   if (s.day % c.macroEvery === 0) {
     const m = pick(s, data.events.macro);
-    applyFx(s, data, m.fx);
+    applyFx(s, data, m.fx, { world: true });
     s.news.push({ k: 'macro', t: m.t, w: 8 });
   }
   for (const x of Object.values(W.industries)) x.boom += int(s, -2, 2);

@@ -1,0 +1,12 @@
+[
+  { "id": "bonus", "on": "reg.acceptance", "gte": 68, "sites": 2, "mine": true, "w": 8, "do": { "policy": 1.3, "days": 10 } },
+  { "id": "town", "on": "reg.acceptance", "gte": 84, "sites": 3, "mine": true, "w": 9, "fx": { "stab": { "$it": 10 } }, "do": { "policy": 1.2, "days": 20 } },
+  { "id": "antitrust", "on": "me.sites", "gte": 6, "mine": true, "w": 9, "strike": 1, "hit": { "cash": -120, "fame": -5 }, "fx": { "reg": { "$self": 12 } } },
+  { "id": "purge", "on": "ind.regulation", "gte": 80, "cool": 15, "mine": "reg", "w": 9, "strike": 1, "hit": { "cash": -90, "fame": -4 }, "fx": { "boom": { "$it": -12 } }, "do": { "set": 45, "npc": -15 } },
+  { "id": "coup", "on": "reg.stability", "lte": 22, "cool": 20, "mine": "stab", "dir": -1, "w": 9, "hit": { "cash": -60 }, "fx": { "acc": { "$it": -10 } }, "do": { "set": 55, "rotate": 1, "unrest": 4 } },
+  { "id": "expel", "on": "reg.acceptance", "lte": 22, "cool": 15, "mine": "acc", "dir": -1, "w": 8, "do": { "set": 35, "lose": 1, "ban": 8 } },
+  { "id": "bubble", "on": "ind.boom", "gte": 88, "cool": 20, "mine": "boom", "min": 12, "w": 9, "fx": { "boom": { "$it": -28 } }, "do": { "npc": -10 } },
+  { "id": "winter", "on": "ind.boom", "lte": 22, "cool": 20, "mine": "boom", "dir": -1, "w": 8, "fx": { "boom": { "$it": 8 }, "reg": { "$it": -10 } }, "do": { "npc": -8 } },
+  { "id": "icon", "on": "me.fame", "gte": 88, "mine": true, "w": 8, "fx": { "acc": { "$all": 5 } } },
+  { "id": "pariah", "on": "me.fame", "lte": 12, "mine": true, "w": 8, "fx": { "acc": { "$all": -6 } } }
+]

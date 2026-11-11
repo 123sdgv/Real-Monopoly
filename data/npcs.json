@@ -1,0 +1,5 @@
+[
+  { "id": "apex", "name": "奇点科技", "industry": "tech", "style": "aggr", "cash": 300, "val": 650, "grow": 1.2, "acts": { "expand": 5, "raise": 3, "war": 2, "idle": 1 } },
+  { "id": "kang", "name": "康域医药", "industry": "pharma", "style": "steady", "cash": 450, "val": 700, "grow": 1, "acts": { "expand": 2, "raise": 1, "idle": 5 } },
+  { "id": "wan", "name": "万象消费", "industry": "consumer", "style": "spec", "cash": 350, "val": 600, "grow": 0.8, "acts": { "expand": 2, "raise": 1, "war": 1, "bet": 4, "idle": 1 } }
+]

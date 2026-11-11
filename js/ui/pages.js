@@ -2,6 +2,7 @@
 import { icon } from './icons.js';
 import { boardHTML } from './boardView.js';
 import { handHTML } from './handView.js';
+import { rewrites } from './sheets.js';
 
 export const startHTML = data => `<article class="paper start">
   <header class="mast"><h1>大富翁</h1><div class="dateline"><span>Real-Monopoly</span><span>创刊号</span></div></header>
@@ -15,19 +16,23 @@ export function deskHTML(s, data) {
   const p = s.player, c = data.config;
   const stat = (ic, v) => `<span class="stat">${icon(ic)}<b class="num">${v}</b></span>`;
   return `<div class="desk">
-  <header class="bar">${stat('cash', p.cash)}${stat('control', p.control + '%')}${stat('fame', p.fame)}${stat('day', s.day + '/' + c.days)}</header>
+  <header class="bar">${stat('cash', p.cash)}${p.status === 'out' ? stat('user', '—') : stat('control', p.control + '%')}${stat('fame', p.fame)}${stat('day', s.day + '/' + c.days)}</header>
   ${boardHTML(s, data)}
   ${handHTML(s, data)}
   <footer class="dock">
-    <button data-act="paper">${icon('paper')}</button><button data-act="co">${icon('co')}</button><button data-act="menu">${icon('menu')}</button>
+    <button data-act="paper">${icon('paper')}</button><button data-act="world">${icon('world')}</button><button data-act="co">${icon('co')}</button>
     <span class="ap">${Array.from({ length: c.ap }, (_, i) => icon('ap', i < s.ap ? 'on' : '')).join('')}</span>
     <button class="primary" data-act="end" ${s.phase === 'act' ? '' : 'disabled'}>${icon('end')}</button>
   </footer></div>`;
 }
 
-export const overHTML = (s, data) => `<article class="paper start">
-  <header class="mast"><h1>终刊</h1><div class="dateline"><span>第 ${data.config.days} 天</span><span>${s.player.name}</span></div></header>
-  <h2 class="head ${s.result.win ? 'mine' : ''}">${icon('worth')}<span class="num">${s.result.worth}</span></h2>
-  <p class="desc">${icon(s.result.win ? 'ok' : 'next')}<span class="num">${data.config.win}</span></p>
+export function overHTML(s, data) {
+  const r = s.result, rank = [{ name: s.player.name, worth: r.worth, me: 1 }, ...r.npcs].sort((a, b) => b.worth - a.worth);
+  return `<article class="paper start">
+  <header class="mast"><h1>终刊</h1><div class="dateline"><span>第 ${r.day} 天</span><span>${s.player.name}</span></div></header>
+  <h2 class="head ${r.win ? 'mine' : ''}">${icon(r.win ? 'worth' : r.quit ? 'stab' : 'end')}<span class="num">${r.worth}</span></h2>
+  <ol class="rank">${rank.map(x => `<li class="${x.me ? 'mine' : ''}"><span>${x.name}</span><b class="num">${x.worth}</b></li>`).join('')}</ol>
+  ${s.rewrites.length ? `<h3 class="left">${icon('pen')}你留下的世界</h3>${rewrites(s)}` : ''}
   <button class="primary wide" data-act="reset">${icon('new')}新局</button>
 </article>`;
+}

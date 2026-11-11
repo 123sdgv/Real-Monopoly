@@ -1,5 +1,5 @@
 [
-  { "id": "north", "name": "北岸", "stability": 62, "acceptance": 50, "industry": "tech", "cares": ["就业", "面子"] },
-  { "id": "delta", "name": "三角洲", "stability": 48, "acceptance": 58, "industry": "consumer", "cares": ["环保", "就业"] },
-  { "id": "highland", "name": "高地", "stability": 70, "acceptance": 42, "industry": "pharma", "cares": ["环保", "面子", "税收"] }
+  { "id": "north", "name": "北岸", "stability": 62, "acceptance": 50, "industry": "tech", "cares": ["job", "face"] },
+  { "id": "delta", "name": "三角洲", "stability": 48, "acceptance": 58, "industry": "consumer", "cares": ["green", "job"] },
+  { "id": "highland", "name": "高地", "stability": 70, "acceptance": 42, "industry": "pharma", "cares": ["green", "face", "money"] }
 ]
