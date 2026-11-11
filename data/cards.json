@@ -1,0 +1,35 @@
+[
+  { "id": "pr_r_1", "type": "pr", "rarity": "R", "name": "紧急声明", "weight": 12, "cooldown": 1, "fx": { "suppress": true } },
+  { "id": "pr_r_2", "type": "pr", "rarity": "R", "name": "公开致歉", "weight": 10, "cooldown": 1, "fx": { "resolve": true, "fame": -2 } },
+  { "id": "pr_sr_1", "type": "pr", "rarity": "SR", "name": "危机公关团队", "weight": 8, "cooldown": 4, "fx": { "suppress": true, "cash": -40 } },
+  { "id": "pr_sr_2", "type": "pr", "rarity": "SR", "name": "媒体恳谈会", "weight": 7, "cooldown": 4, "fx": { "resolve": true, "cash": -60, "fame": 2 } },
+  { "id": "pr_ssr_1", "type": "pr", "rarity": "SSR", "name": "舆论翻盘", "weight": 4, "cooldown": 8, "fx": { "resolve": true, "fame": 8 } },
+
+  { "id": "fin_r_1", "type": "fin", "rarity": "R", "name": "短期贷款", "weight": 10, "cooldown": 1, "fx": { "cash": 120, "debt": 135 } },
+  { "id": "fin_r_2", "type": "fin", "rarity": "R", "name": "应收保理", "weight": 8, "cooldown": 2, "fx": { "cash": 60, "fame": -1 } },
+  { "id": "fin_sr_1", "type": "fin", "rarity": "SR", "name": "风险投资", "weight": 7, "cooldown": 6, "news": "fin", "w": 4, "fx": { "cash": 300, "control": -12 } },
+  { "id": "fin_sr_2", "type": "fin", "rarity": "SR", "name": "债务重组", "weight": 6, "cooldown": 5, "fx": { "debt": -150, "fame": -3 } },
+  { "id": "fin_ssr_1", "type": "fin", "rarity": "SSR", "name": "战略注资", "weight": 4, "cooldown": 10, "news": "fin", "w": 6, "fx": { "cash": 600, "control": -15, "val": 100 } },
+
+  { "id": "ops_r_1", "type": "ops", "rarity": "R", "name": "新建厂区", "weight": 12, "cooldown": 1, "news": "build", "fx": { "cash": -60, "site": 1, "acc": { "$here": 2 } } },
+  { "id": "ops_r_2", "type": "ops", "rarity": "R", "name": "降本增效", "weight": 9, "cooldown": 2, "fx": { "cash": 40, "fame": -1 } },
+  { "id": "ops_r_3", "type": "ops", "rarity": "R", "name": "合规整改", "weight": 9, "cooldown": 2, "fx": { "cash": -30, "shield": 6 } },
+  { "id": "ops_r_tech", "type": "ops", "rarity": "R", "name": "开源发布", "weight": 9, "cooldown": 2, "when": { "industry": ["tech"] }, "fx": { "fame": 4, "val": 30 } },
+  { "id": "ops_r_pharma", "type": "ops", "rarity": "R", "name": "临床加速", "weight": 9, "cooldown": 2, "when": { "industry": ["pharma"] }, "fx": { "cash": -50, "val": 80 } },
+  { "id": "ops_r_consumer", "type": "ops", "rarity": "R", "name": "联名爆款", "weight": 9, "cooldown": 2, "when": { "industry": ["consumer"] }, "fx": { "cash": 70, "fame": 2 } },
+  { "id": "ops_sr_1", "type": "ops", "rarity": "SR", "name": "研发突破", "weight": 7, "cooldown": 5, "news": "card", "w": 4, "when": { "industry": ["tech", "pharma"] }, "fx": { "cash": -80, "val": 120 } },
+  { "id": "ops_sr_2", "type": "ops", "rarity": "SR", "name": "渠道下沉", "weight": 7, "cooldown": 5, "news": "card", "w": 4, "when": { "industry": ["consumer"] }, "fx": { "cash": -60, "val": 90, "fame": 2 } },
+  { "id": "ops_sr_3", "type": "ops", "rarity": "SR", "name": "行业峰会", "weight": 6, "cooldown": 6, "news": "card", "w": 5, "fx": { "cash": -50, "fame": 3, "boom": { "$self": 6 } } },
+  { "id": "ops_ssr_1", "type": "ops", "rarity": "SSR", "name": "标准制定者", "weight": 4, "cooldown": 12, "news": "card", "w": 8, "fx": { "val": 250, "boom": { "$self": 8 }, "reg": { "$self": -10 } } },
+
+  { "id": "net_1", "type": "net", "rarity": "R", "name": "老同学", "weight": 6, "cooldown": 4, "fx": { "reveal": 1, "favor": true } },
+  { "id": "net_2", "type": "net", "rarity": "R", "name": "幕后人物", "lvl": 3, "weight": 5, "cooldown": 6, "fx": { "resolve": true, "favor": true } },
+  { "id": "net_3", "type": "net", "rarity": "R", "name": "银行行长", "weight": 5, "cooldown": 6, "fx": { "cash": 150, "favor": true } },
+
+  { "id": "hole_1", "type": "hole", "rarity": "R", "name": "一通电话", "lvl": 3, "weight": 2, "cooldown": 12, "fx": { "suppress": true } },
+  { "id": "hole_2", "type": "hole", "rarity": "R", "name": "秘密账户", "weight": 2, "cooldown": 12, "fx": { "cash": 250 } },
+  { "id": "hole_3", "type": "hole", "rarity": "R", "name": "旧日恩情", "weight": 2, "cooldown": 12, "fx": { "debt": -200, "fame": 3 } },
+
+  { "id": "wild_r", "type": "wild", "rarity": "R", "name": "万能牌", "weight": 1, "cooldown": 8 },
+  { "id": "wild_sr", "type": "wild", "rarity": "SR", "name": "万能牌", "weight": 1, "cooldown": 10 }
+]

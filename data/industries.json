@@ -1,0 +1,5 @@
+[
+  { "id": "tech", "name": "科技", "boom": 55, "regulation": 30 },
+  { "id": "pharma", "name": "医药", "boom": 50, "regulation": 45 },
+  { "id": "consumer", "name": "消费", "boom": 52, "regulation": 25 }
+]
