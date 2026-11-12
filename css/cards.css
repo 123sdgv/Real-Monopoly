@@ -1,0 +1,13 @@
+.handbar { display: flex; justify-content: flex-end; font-size: 12px; color: var(--mute); }
+.hand { display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 12px; min-height: 126px; scrollbar-width: none; }
+.hand::-webkit-scrollbar { display: none; }
+.card { flex: 0 0 104px; min-height: 108px; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 6px; padding: 8px; text-align: left; background: var(--card); border-radius: 1px; box-shadow: 2px 2px 0 var(--rule); }
+.hand .card:nth-child(odd) { transform: rotate(-.7deg); }
+.hand .card:nth-child(even) { transform: rotate(.6deg); }
+.card .top { display: flex; justify-content: space-between; width: 100%; font: 11px var(--mono); color: var(--mute); }
+.card strong { font: 700 15px/1.25 var(--serif); }
+.card.ra-SR { border-width: 2px; }
+.card.ra-SSR { border: 2px solid var(--red); }
+.card.ty-hole { background: var(--ink); color: var(--paper); }
+.card.ty-hole .top { color: #f4eeddaa; }
+.card.ty-hole .pos { color: #8fd0aa; } .card.ty-hole .neg { color: #f0958c; }
