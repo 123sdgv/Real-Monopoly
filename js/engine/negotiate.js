@@ -2,7 +2,7 @@
 // 结果数值落在预设区间里，由 存档种子 + 天数 + 对象 算出：同样的选择必然得到同样的结果，不走随机数。
 import { applyFx } from './world.js';
 import { cardOf } from './cards.js';
-import { ipo, valuation } from './company.js';
+import { ipo, loanRate, valuation } from './company.js';
 import { merge, mergePrice } from './npc.js';
 import { caresOf, report } from './news.js';
 
@@ -31,7 +31,7 @@ export function dealErr(s, data, P, deal, arg) {
 // 要命中几项。股东代表：控制权越低、名声越差越难说服；跨行业并购、夺回控制权再加一项。
 export function needOf(s, data, P, deal, arg) {
   const p = s.player;
-  let n = P.need || 1;
+  let n = (P.need || 1) + (p.fame < data.config.fame.shun); // 名声扫地，谁都要你多拿一样东西
   if (P.kind === 'rep') {
     n = 1 + (p.control < 50) + (p.fame < 35) - (s.trust >= 2);
     if (deal === 'retake' || (deal === 'merge' && data.npcs.find(x => x.id === arg)?.industry !== p.industry)) n++;
@@ -72,6 +72,7 @@ export function negotiate(s, data, a, log) {
   if (!ok) { log.push({ type: 'deal', ok: false, hits: hits.length, need }); return; } // 没谈成：筹码收回，只丢行动点
   for (const i of pickd.filter(x => x.i != null).map(x => x.i).sort((x, y) => y - x)) s.hand.splice(i, 1);
   for (const x of pickd) applyFx(s, data, x.fx, { region: P.region });
+  p.n.deals = (p.n.deals || 0) + 1;
   const f = hash(s.seed, s.day, P.id) * 0.5 + (hits.length > need ? 0.5 : 0); // 超额命中拿区间上半
   log.push({ type: 'deal', ok: true, deal: a.deal, v: close(s, data, P, a, f) });
 }
@@ -95,7 +96,7 @@ function close(s, data, P, a, f) {
     }
     case 'loan': {
       const v = span('loan');
-      p.cash += v; p.debt += Math.round(v * c.loan.rate);
+      p.cash += v; p.debt += Math.round(v * loanRate(s, data));
       s.flags.loan = s.day;
       return v;
     }

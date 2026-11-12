@@ -1,19 +1,25 @@
-.board { display: grid; grid-template: repeat(7, 1fr) / repeat(7, 1fr); gap: 3px; aspect-ratio: 1; margin: 10px 0; }
-.tile { position: relative; display: grid; place-items: center; border: 1px solid var(--rule); color: var(--mute); }
-.tile .i { width: 50%; height: 50%; }
-.tile.t-reg { color: #fff; border-color: transparent; }
-.tile.t-rest { background: #1d1b1810; }
+/* 环形轨道：外圈 24 格连成一条带子，中间的桌面放骰子 */
+.board { display: grid; grid-template: repeat(7, 1fr) / repeat(7, 1fr); aspect-ratio: 1; margin: 12px 0 10px; border: 1.5px solid var(--ink); border-radius: 16px; overflow: hidden; background: var(--card); }
+.tile { position: relative; display: grid; place-items: center; color: var(--mute); box-shadow: 0 0 0 .5px var(--rule); }
+.tile .i { width: 46%; height: 46%; }
+.tile.t-reg { color: #fff; }
+.tile.t-rest { background: #1d1b1812; }
+.tile.t-dil { color: var(--ink); }
 .tile.unrest { background-image: repeating-linear-gradient(45deg, #0000 0 4px, #0005 4px 8px); }
-.tile .n { position: absolute; right: 3px; top: 0; font: 700 10px var(--mono); font-style: normal; }
-.tile.here { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 1; }
-.me { position: absolute; right: -5px; bottom: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--red); border: 2px solid var(--paper); }
+.tile .n { position: absolute; right: 4px; top: 1px; font: 700 10px var(--mono); font-style: normal; }
+.tile.here:not(.t-reg) { background: #a3271f1c; color: var(--ink); }
+.me { position: absolute; left: 50%; bottom: 3px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--red); border: 2px solid var(--card); box-shadow: 0 1px 0 #1d1b1860; }
+.me.hop { animation: hop .13s ease-out; }
+@keyframes hop { from { transform: translateY(-9px) scale(1.25); } }
 
-.hub { grid-area: 2 / 2 / 7 / 7; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 8px; }
+.hub { grid-area: 2 / 2 / 7 / 7; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 8px; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 6px; margin: -.5px; }
 .die { width: 76px; height: 76px; padding: 0; border: 0; }
 .die .i { width: 100%; height: 100%; stroke-width: 1.200; }
 .die:disabled { opacity: .55; }
 .die.live { color: var(--red); animation: pulse 1s ease-in-out infinite; }
+.die.rolling { opacity: 1; color: var(--ink); animation: tumble .48s cubic-bezier(.3, .6, .3, 1); }
 @keyframes pulse { 50% { transform: scale(1.08) rotate(4deg); } }
+@keyframes tumble { from { transform: rotate(-320deg) scale(.55); } 70% { transform: rotate(14deg) scale(1.12); } }
 .legend { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-.todo { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 6px; border: 1px solid var(--red); color: var(--red); padding: 5px 8px; font-size: 13px; }
+.todo { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 6px; border: 1px solid var(--red); color: var(--red); padding: 5px 8px; font-size: 13px; background: var(--card); }
 .todo span { display: inline-flex; align-items: center; gap: 6px; }

@@ -4,6 +4,20 @@ import { applyFx } from './world.js';
 
 const opt = (l, fx = {}, x = {}) => ({ l, fx, ...x });
 
+// 事件的出场条件 when: lean{倾向:次数} flag[全部发生过] not[都没发生过] listed
+const fits = (s, w) => !w || (
+  Object.entries(w.lean || {}).every(([k, n]) => (s.player.lean[k] || 0) >= n) &&
+  (w.flag || []).every(f => s.flags[f]) && !(w.not || []).some(f => s.flags[f]) &&
+  (w.listed == null || w.listed === s.player.listed));
+
+// 从池子里挑一件：先过条件，刚出过的先不重复，再加权随机
+function pickEv(s, pool, cool) {
+  const ok = pool.filter(e => fits(s, e.when)), fresh = ok.filter(e => !(s.seen[e.id] > s.day - cool));
+  const ev = weighted(s, fresh.length ? fresh : ok, e => e.p ?? 10);
+  s.seen[ev.id] = s.day;
+  return ev;
+}
+
 // 落在格子上：生成一个待处理事件 s.pending。不在 CEO 位置上时，公司的事轮不到你，只有私事。
 export function land(s, data) {
   const c = data.config, p = s.player, tile = c.board[p.pos], E = data.events, ceo = p.status === 'ceo';
@@ -20,8 +34,14 @@ export function land(s, data) {
     };
     return;
   }
-  const ev = tile === 'dil' ? pick(s, data.dilemmas)
-    : weighted(s, !ceo ? E.life : tile === 'ind' ? E.ind[p.industry] : E.gen, e => e.p ?? 10);
+  let ev;
+  if (ceo && tile === 'gen') { // 倾向剧本：过去的选择找上门，每个只来一次
+    const mine = E.lean.filter(e => !s.seen[e.id] && fits(s, e.when));
+    if (mine.length && chance(s, c.lean)) { ev = pick(s, mine); s.seen[ev.id] = s.day; }
+  }
+  const R = c.repeat;
+  ev ||= tile === 'dil' ? pickEv(s, data.dilemmas, R.dil)
+    : !ceo ? pickEv(s, E.life, R.life) : tile === 'ind' ? pickEv(s, E.ind[p.industry], R.ind) : pickEv(s, E.gen, R.gen);
   s.pending = ev.k === 'crisis'
     ? { k: 'crisis', t: ev.t, d: ev.d, lvl: ev.lvl, fx: ev.fx, opts: [opt('ok')] }
     : { k: ev.opts ? 'choice' : 'instant', t: ev.t, d: ev.d, w: ev.w, opts: ev.opts || [opt('ok', ev.fx)] };
@@ -74,7 +94,7 @@ export function night(s, data) {
     s.news.push({ k: 'nat', r, n, w: 7, mine: n > 0 });
   }
   if (s.day % c.macroEvery === 0) {
-    const m = pick(s, data.events.macro);
+    const m = pickEv(s, data.events.macro, c.repeat.macro);
     applyFx(s, data, m.fx, { world: true });
     s.news.push({ k: 'macro', t: m.t, w: 8 });
   }

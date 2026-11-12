@@ -34,5 +34,5 @@ export function makePaper(s, data) {
     });
     return { id: x.id, name: x.name, boom: w.boom, d, co };
   });
-  return { day: s.day, head: news[0] || { title: pick(s, H.quiet), mine: false }, items: news.slice(1, 5), ind, small };
+  return { day: s.day, me: s.me, head: news[0] || { title: pick(s, H.quiet), mine: false }, items: news.slice(1, 5), ind, small };
 }

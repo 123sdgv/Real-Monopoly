@@ -3,10 +3,11 @@ import { chance, int } from './rng.js';
 import { cardOf, draw, play, statusOk } from './cards.js';
 import { land, night, resolve } from './events.js';
 import { applyFx, settle, watch } from './world.js';
-import { income, netWorth, npcWorth, seat, vote } from './company.js';
+import { harm, income, netWorth, npcWorth, seat, vote } from './company.js';
 import { npcNight, short, trade } from './npc.js';
 import { negotiate } from './negotiate.js';
 import { makePaper } from './paper.js';
+import { fill } from './news.js';
 
 export function step(prev, a, data) {
   const s = JSON.parse(JSON.stringify(prev)), log = [];
@@ -16,6 +17,7 @@ export function step(prev, a, data) {
   if (s.player.status !== prev.player.status) { // 身份变了：公司的牌和公司的麻烦都留在公司
     s.hand = s.hand.filter(id => statusOk(cardOf(data, id), s.player.status));
     s.todo = null;
+    s.path.push([s.player.status, s.day]);
     log.push({ type: 'status', to: s.player.status });
   }
   if (s.owe) { draw(s, data, s.owe, log); delete s.owe; }
@@ -81,7 +83,7 @@ function endDay(s, data, log) {
   const c = data.config, p = s.player;
   s.strike = 0;
   if (s.todo) { // 没处理的危机今晚爆发，明天见报
-    applyFx(s, data, s.todo.fx);
+    applyFx(s, data, s.todo.fx, { mult: harm(s, data) });
     s.news.push({ k: 'crisis', t: s.todo.t, w: 5 + s.todo.lvl, mine: true });
     if (s.todo.lvl >= 2) s.strike++;
     s.todo = null;
@@ -91,9 +93,10 @@ function endDay(s, data, log) {
   if (p.status === 'holder') p.valBonus += int(s, -c.holder.drift, c.holder.drift); // 公司没了你照样在转
   s.ledger = s.ledger.filter(e => { // 暗账：每天小概率翻出，后果加倍
     if (!chance(s, c.ledger.flip)) return true;
-    applyFx(s, data, e.fx, { mult: c.ledger.mult });
+    applyFx(s, data, e.fx, { mult: c.ledger.mult * harm(s, data) });
     s.news.push({ k: 'flip', t: e.t, w: 9, mine: true });
     log.push({ type: 'flip', t: e.t });
+    p.n.flips = (p.n.flips || 0) + 1;
     s.strike++;
     return false;
   });
@@ -107,6 +110,8 @@ function endDay(s, data, log) {
   seat(s, data);
   log.push({ type: 'night', income: inc });
   const worth = netWorth(s, data);
+  if (worth > s.peak[0]) s.peak = [worth, s.day];
+  s.me = { inc, worth, d: worth - s.me.worth }; // 明早报纸角落的昨日账
   if (s.day >= c.days || (worth >= c.win && data.npcs.every(n => worth > npcWorth(s, data, n.id)))) return finish(s, data);
   s.day++;
   s.ap = c.ap;
@@ -122,5 +127,6 @@ function finish(s, data, quit) {
   const npcs = data.npcs.filter(n => s.npcs[n.id].alive).map(n => ({ name: n.name, worth: npcWorth(s, data, n.id) }));
   s.phase = 'over';
   s.pending = null;
-  s.result = { worth, npcs, day: s.day, quit: !!quit, win: !quit && npcs.every(n => worth > n.worth) && (worth >= c.win || s.day >= c.days) };
+  const win = !quit && npcs.every(n => worth > n.worth) && (worth >= c.win || s.day >= c.days);
+  s.result = { worth, npcs, day: s.day, quit: !!quit, win, title: fill(s, data, quit ? 'end_quit' : win ? 'end_win' : 'end_lose'), none: s.rewrites.length ? '' : fill(s, data, 'end_none') };
 }

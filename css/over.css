@@ -1,0 +1,39 @@
+/* 终刊：你留下的世界 */
+.left { display: flex; align-items: center; gap: 6px; font: 900 18px var(--serif); margin: 18px 0 6px; padding-top: 10px; border-top: 3px double var(--ink); }
+.left em { margin-left: auto; font: 400 12px var(--serif); color: var(--mute); }
+.left > .num { font-size: 20px; margin-left: 4px; }
+.over .desc { margin: 4px 0 0; }
+
+/* 时间线：一条细线串起每一次因你而变，红点是你 */
+.line { list-style: none; padding: 2px 0 0; margin-left: 30px; border-left: 1px solid var(--ink); }
+.line li { position: relative; padding: 5px 0 9px 14px; font: 600 15px/1.4 var(--serif); }
+.line li::before { content: ""; position: absolute; left: -4.5px; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.line .num { position: absolute; left: -32px; top: 7px; width: 22px; text-align: right; font-size: 12px; font-weight: 400; color: var(--mute); }
+
+/* 前后对比：实心是终局，竖线是开局 */
+.then { margin-top: 10px; border-top: 1px solid var(--ink); }
+.then .wrow { gap: 6px; }
+.then .tag, .then .lab { flex: 0 0 58px; }
+.mtr.was { flex: 1; min-width: 0; }
+.mtr.was > i { flex: 1; min-width: 26px; }
+.mtr.was > i > u { position: absolute; top: -4px; bottom: -4px; width: 0; border-left: 2px solid var(--red); }
+.mtr.was .num { flex: 0 0 30px; display: inline-flex; align-items: center; font-size: 11px; }
+.mtr.was .num .i { width: 9px; height: 9px; }
+.turn { flex: 0 0 62px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; font: 12px var(--serif); }
+.cap { font: 11px var(--serif); color: var(--mute); text-align: right; padding-top: 4px; }
+.turn .gone { text-decoration: line-through; color: var(--red); }
+.turn span + span { margin-left: 4px; }
+
+.path, .lean { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 0; }
+.path span { display: inline-flex; flex-direction: column; align-items: center; font-size: 20px; }
+.path i { font: 11px var(--mono); font-style: normal; color: var(--mute); }
+.lean span { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--ink); padding: 3px 8px; font: 600 14px var(--serif); }
+.lean i { font: 11px var(--mono); font-style: normal; color: var(--mute); }
+
+.rank { list-style: none; padding: 0; border-top: 1px solid var(--ink); }
+.rank li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--rule); font: 600 16px var(--serif); }
+.rank li.mine { box-shadow: inset 4px 0 0 var(--red); padding-left: 12px; }
+.tally { display: flex; justify-content: space-between; padding: 12px 2px 0; font-size: 12px; color: var(--mute); }
+.tally span { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+.tally b { font-size: 16px; color: var(--ink); }
+.over > .opts { margin-top: 18px; }

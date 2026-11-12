@@ -5,7 +5,7 @@ import { bust, valuation } from './company.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-// fx 词汇：cash fame control debt val ap draw shield site reveal
+// fx 词汇：cash fame control debt val inc ap draw shield site reveal
 //          boom/reg {行业:Δ}  stab/acc {地区:Δ}   键可用 $self（本行业）$here（当前地区）$it（事件对象）$all
 // o: { region, it, mult, world }   world=true：不是玩家推动的（宏观、NPC、世界事件本身），不计入归因
 export function applyFx(s, data, fx, o = {}) {
@@ -24,10 +24,14 @@ export function applyFx(s, data, fx, o = {}) {
   if (fx.control) p.control += n(fx.control);
   if (fx.debt) p.debt = Math.max(0, p.debt + n(fx.debt));
   if (fx.val) p.valBonus += n(fx.val);
+  if (fx.inc) p.inc += fx.inc;
   if (fx.ap) s.ap = Math.max(0, s.ap + fx.ap);
   if (fx.draw) s.owe = (s.owe || 0) + fx.draw;
   if (fx.shield) p.shield = Math.max(p.shield, s.day + fx.shield);
-  if (fx.site && o.region) p.sites[o.region] = Math.max(0, p.sites[o.region] + fx.site);
+  if (fx.site && o.region) {
+    p.sites[o.region] = Math.max(0, p.sites[o.region] + fx.site);
+    if (fx.site > 0) p.n.built = (p.n.built || 0) + fx.site;
+  }
   if (fx.reveal) {
     let k = fx.reveal;
     for (const q of s.queue) if (k && q.omen && !q.seen) { q.seen = 1; k--; }
@@ -80,6 +84,7 @@ export function watch(s, data) {
       const val = kind === 'ind' ? W.industries[it][v] : kind === 'reg' ? W.regions[it][v] : me[v];
       if (ev.gte != null ? val < ev.gte : val > ev.lte) continue;
       if (ev.sites && !(p.status === 'ceo' && p.sites[it] >= ev.sites)) continue;
+      if (ev.other && W.regions[it].industry === p.industry) continue;
       const id = ev.id + (it ? ':' + it : ''), last = s.flags[id];
       if (last && (!ev.cool || s.day - last < ev.cool)) continue;
       s.flags[id] = s.flags[ev.id] = s.day;
@@ -101,11 +106,13 @@ function fire(s, data, ev, kind, v, it) {
     const R = W.regions[it];
     R.industry = data.industries.filter(i => i.id !== R.industry).sort((a, b) => W.industries[b.id].boom - W.industries[a.id].boom)[0].id;
   }
+  if (x.adopt) W.regions[it].industry = p.industry; // 厂建得够多，当地改吃你这碗饭
+  if (x.rival) for (const d of data.npcs) if (d.industry === p.industry && s.npcs[d.id].alive) s.npcs[d.id].val = Math.round(s.npcs[d.id].val * (1 + x.rival / 100));
   if (x.unrest) W.regions[it].unrest = s.day + x.unrest;
   if (x.ban) W.regions[it].ban = s.day + x.ban;
   if (x.lose && hit) p.sites[it] = Math.max(0, p.sites[it] - x.lose);
   if (x.policy) s.policies.push({ r: it, v: x.policy, until: s.day + x.days });
-  const H = data.headlines, title = fill(s, data, mine && H[ev.id + '_me'] ? ev.id + '_me' : ev.id, kind === 'reg' ? { r: it } : { i: it });
+  const H = data.headlines, title = fill(s, data, mine && H[ev.id + '_me'] ? ev.id + '_me' : ev.id, kind === 'reg' ? { r: it, i: p.industry } : { i: it || p.industry });
   s.news.push({ title, w: ev.w || 8, mine });
   if (mine) s.rewrites.push({ day: s.day, k: ev.id, title });
 }

@@ -50,7 +50,10 @@ export function npcNight(s, data) {
     if (r >= k.win) {
       applyFx(s, data, { boom: { [d.industry]: -k.boom } });
       report(s, data, 'short', { t: d.name, i: d.industry, n: pnl }, 8, true, true);
-    } else report(s, data, 'shortFail', { t: d.name }, 3, true);
+    } else {
+      if (s.npcs[x.id].alive) s.npcs[x.id].val += x.dip; // 空头回补，砸出来的坑被填平
+      report(s, data, 'shortFail', { t: d.name }, 3, true);
+    }
     return false;
   });
 }
@@ -60,6 +63,7 @@ export function trade(s, data, a) {
   const c = data.config.stock, p = s.player, k = c.step, buy = a.n > 0, self = a.id === 'self';
   if (s.ap < 1) return 'ap';
   if (self ? p.status !== 'holder' : !s.npcs[a.id]?.alive) return self ? 'status' : 'target';
+  if (!self && buy && !s.npcs[a.id].listed) return 'private'; // 没上市的公司，股票不在市面上
   const per = ((self ? Math.max(1, valuation(s, data)) : npcWorth(s, data, a.id)) * k) / 100;
   const own = self ? p.control : p.stake[a.id];
   let q = k;
@@ -81,13 +85,15 @@ export function trade(s, data, a) {
 export function short(s, data, id) {
   const c = data.config.short, p = s.player, n = s.npcs[id];
   if (!n?.alive) return 'target';
+  if (!n.listed) return 'private';
   if (s.shorts.some(x => x.id === id)) return 'active';
   if (s.ap < 1) return 'ap';
   if (p.cash < c.size) return 'cash';
   s.ap--;
   p.cash -= c.size;
-  s.shorts.push({ id, m: c.size, base: npcWorth(s, data, id), due: s.day + c.days });
-  n.val = Math.round(n.val * (1 - c.push));
+  const dip = Math.round(n.val * c.push);
+  s.shorts.push({ id, m: c.size, base: npcWorth(s, data, id), due: s.day + c.days, dip });
+  n.val -= dip;
 }
 
 export const mergePrice = (s, data, id) =>
