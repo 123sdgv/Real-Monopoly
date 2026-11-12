@@ -72,11 +72,14 @@ export function play(s, data, a, log) {
     // 压下：不见报，进暗账，行业监管压力暗中累积（记在玩家头上）
     s.ledger.push({ t: s.todo.t, fx: s.todo.fx, day: s.day });
     applyFx(s, data, { reg: { $self: data.config.ledger.regulation } });
+    p.n.hush = (p.n.hush || 0) + 1;
   }
+  if (c.ledger) s.ledger.push({ ...c.ledger, day: s.day }); // 灰色牌：好处现在拿，账记在暗处
   if (fx.suppress || fx.resolve) s.todo = null;
   if (fx.restart) restart(s, data, a.arg);
   applyFx(s, data, fx, { region: a.arg });
   if (fx.favor) s.queue.push({ k: 'favor', due: s.day + int(s, 10, 18), who: pick(s, data.config.callers) });
   if (c.news) s.news.push({ k: c.news, t: c.name, r: a.arg, w: c.w || 3, mine: true });
+  p.n.plays = (p.n.plays || 0) + 1;
   log.push({ type: 'play', id: c.id });
 }

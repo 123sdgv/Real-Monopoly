@@ -3,6 +3,11 @@
 import { report } from './news.js';
 
 export const boomF = (s, ind) => s.world.industries[ind].boom / 50;
+const lerp = (s, [lo, hi]) => lo + (s.player.fame / 100) * (hi - lo);
+// 名声的三处用场：经营收入的倍率、丑闻的杀伤力（名声越差越疼）、贷款的成本
+export const fameF = (s, data) => lerp(s, data.config.fame.income);
+export const harm = (s, data) => lerp(s, data.config.fame.harm);
+export const loanRate = (s, data) => data.config.loan.rate + lerp(s, data.config.fame.loan);
 
 export function valuation(s, data) {
   const c = data.config, p = s.player;
@@ -27,7 +32,7 @@ export const netWorth = (s, data) =>
 export function income(s, data) {
   const c = data.config, p = s.player, due = p.debt * c.income.interest;
   if (p.status === 'out') return Math.round(c.out.wage - due);
-  let v = c.income.base * boomF(s, p.industry) * (0.6 + p.fame / 125) + p.inc;
+  let v = c.income.base * boomF(s, p.industry) + p.inc;
   for (const r of data.regions) {
     const w = s.world.regions[r.id];
     if (w.unrest >= s.day) continue;
@@ -40,6 +45,7 @@ export function income(s, data) {
     if (n.war >= s.day && d.industry === p.industry) v *= c.npc.war.f;
     if (n.ally >= s.day) v *= 1 + n.allyV / 100;
   }
+  v *= fameF(s, data);
   if (p.status === 'holder') v = Math.max(0, v) * (p.control / 100) * c.holder.div; // 股东只拿分红
   return Math.round(v - due);
 }

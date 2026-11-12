@@ -2,34 +2,65 @@
   "gen": [
     { "id": "g_tax", "t": "税务稽查", "d": "补缴一笔税款。", "fx": { "cash": -30 }, "w": 2 },
     { "id": "g_refund", "t": "退税到账", "d": "一笔意外的进账。", "fx": { "cash": 35 }, "w": 1 },
+    { "id": "g_renew", "t": "老客户续约", "d": "对方连合同都没细看就签了。", "fx": { "cash": 45 }, "w": 1 },
+    { "id": "g_power", "t": "限电通知", "d": "园区限电三天，产线停了一半。", "fx": { "cash": -25 }, "w": 2 },
     { "id": "g_award", "t": "年度企业评选", "d": "你的公司榜上有名。", "fx": { "fame": 4 }, "w": 3 },
-    { "id": "g_donate", "t": "公益募捐", "d": "主办方把话筒递到你面前。", "opts": [{ "l": "捐", "fx": { "cash": -40, "fame": 5, "acc": { "$all": 2 } } }, { "l": "不捐", "fx": { "fame": -1 } }] },
+    { "id": "g_donate", "t": "公益募捐", "d": "主办方把话筒递到你面前。", "opts": [{ "l": "捐", "fx": { "cash": -40, "fame": 5, "acc": { "$all": 2 } }, "lean": "people" }, { "l": "不捐", "fx": { "fame": -1 }, "lean": "profit" }] },
+    { "id": "g_audit", "t": "年报审计", "d": "审计师指着一行数字，等你开口。", "opts": [{ "l": "如实披露", "fx": { "val": -20, "fame": 3 }, "lean": "clean" }, { "l": "修饰一下", "fx": { "val": 30 }, "lean": "gray", "ledger": { "t": "年报注水", "fx": { "val": -60, "fame": -8 } } }] },
+    { "id": "g_media", "t": "电视专访", "d": "主持人问：你们真的赚钱吗？", "opts": [{ "l": "说真话", "fx": { "fame": 4, "val": -15 } }, { "l": "说场面话", "fx": { "fame": 1 } }] },
+    { "id": "g_campus", "t": "校招季", "d": "简历堆了半张桌子。", "opts": [{ "l": "扩招", "fx": { "cash": -40, "val": 40, "acc": { "$all": 1 } }, "lean": "people" }, { "l": "冻结编制", "fx": { "cash": 20, "fame": -1 }, "lean": "profit" }] },
+    { "id": "g_union", "t": "工会谈判", "d": "代表们带来了一份涨薪清单。", "opts": [{ "l": "涨薪", "fx": { "cash": -50, "fame": 2, "stab": { "$all": 2 } }, "lean": "people" }, { "l": "强硬", "fx": { "fame": -3, "stab": { "$all": -3 } }, "lean": "profit" }] },
+    { "id": "g_fixer", "t": "有人递话", "d": "一位中间人说，批文的事他能摆平。", "opts": [{ "l": "收下门路", "fx": { "val": 40 }, "lean": "gray", "ledger": { "t": "批文疑云", "fx": { "cash": -70, "fame": -10 } } }, { "l": "回绝", "fx": { "fame": 1 }, "lean": "clean" }] },
+    { "id": "g_dinner", "t": "行业晚宴", "d": "酒过三巡，真话才刚开始。", "opts": [{ "l": "应酬到底", "fx": { "cash": -25, "reveal": 1 }, "lean": "work" }, { "l": "早点回家", "fx": {}, "lean": "family" }] },
     { "id": "g_leak", "k": "crisis", "t": "内部邮件外泄", "d": "几封不该外传的邮件到了记者手里。", "lvl": 1, "fx": { "fame": -6 } },
     { "id": "g_rumor", "k": "crisis", "t": "做空传闻", "d": "有人在散播对你不利的研究报告。", "lvl": 1, "fx": { "fame": -4, "val": -20 } },
+    { "id": "g_labor", "k": "crisis", "t": "劳动仲裁", "d": "一位离职员工把公司告了。", "lvl": 1, "fx": { "cash": -45, "fame": -3 } },
+    { "id": "g_supplier", "k": "crisis", "t": "供应商跑路", "d": "预付款打过去，电话就再没人接。", "lvl": 1, "fx": { "cash": -55 } },
     { "id": "g_accident", "k": "crisis", "t": "厂区事故", "d": "夜班出了事，救护车来过。", "lvl": 2, "fx": { "cash": -60, "fame": -8, "acc": { "$all": -3 } } },
     { "id": "g_strike", "k": "crisis", "t": "员工抗议", "d": "门口聚了一群人，举着牌子。", "lvl": 2, "fx": { "cash": -40, "fame": -6, "stab": { "$all": -3 } } },
+    { "id": "g_fire", "k": "crisis", "t": "仓库失火", "d": "火是后半夜起的，账本也在里面。", "lvl": 2, "fx": { "cash": -90, "val": -30 } },
     { "id": "g_scandal", "k": "crisis", "t": "高管丑闻", "d": "一位副总的私事成了公事。", "lvl": 3, "p": 4, "fx": { "cash": -80, "fame": -15 } }
   ],
   "ind": {
     "tech": [
       { "id": "t_order", "t": "政府云订单", "d": "一份大单落到你手里。", "fx": { "cash": 80 }, "w": 4 },
+      { "id": "t_rank", "t": "入选独角兽榜", "d": "榜单一出，投资人的电话多了起来。", "fx": { "fame": 3, "val": 30 }, "w": 3 },
       { "id": "t_talent", "t": "挖角机会", "d": "对手的首席架构师想跳槽。", "opts": [{ "l": "高薪挖人", "fx": { "cash": -60, "val": 80 } }, { "l": "放弃", "fx": {} }] },
+      { "id": "t_wave", "t": "风口来了", "d": "所有人都在谈同一个新词。", "opts": [{ "l": "重注跟进", "fx": { "cash": -80, "val": 110, "boom": { "tech": 3 } } }, { "l": "按兵不动", "fx": {} }] },
+      { "id": "t_export", "t": "数据出境审查", "d": "一封问询函，限期十五天答复。", "opts": [{ "l": "配合整改", "fx": { "cash": -40, "shield": 5 }, "lean": "clean" }, { "l": "打擦边球", "fx": { "val": 30, "reg": { "tech": 4 } }, "lean": "gray" }] },
+      { "id": "t_patent", "k": "crisis", "t": "专利诉讼", "d": "一纸律师函寄到前台。", "lvl": 1, "fx": { "cash": -70 } },
       { "id": "t_breach", "k": "crisis", "t": "数据泄露", "d": "用户数据在暗网挂牌出售。", "lvl": 2, "fx": { "cash": -50, "fame": -10 } },
-      { "id": "t_patent", "k": "crisis", "t": "专利诉讼", "d": "一纸律师函寄到前台。", "lvl": 1, "fx": { "cash": -70 } }
+      { "id": "t_outage", "k": "crisis", "t": "全网宕机", "d": "首页白了四个小时。", "lvl": 2, "fx": { "cash": -60, "fame": -8, "val": -30 } }
     ],
     "pharma": [
       { "id": "p_trial", "t": "临床数据亮眼", "d": "三期结果好于预期。", "fx": { "val": 60, "fame": 2 }, "w": 4 },
+      { "id": "p_flu", "t": "流感季", "d": "药房的货架一天补三次。", "fx": { "cash": 60 }, "w": 3 },
       { "id": "p_tender", "t": "集采开标", "d": "低价能中，但利润所剩无几。", "opts": [{ "l": "低价中标", "fx": { "cash": 60, "val": -20 } }, { "l": "弃标", "fx": { "fame": -1 } }] },
+      { "id": "p_license", "t": "海外授权", "d": "一家跨国药企想买断你的在研管线。", "opts": [{ "l": "卖断权益", "fx": { "cash": 120, "val": -50 } }, { "l": "自己做", "fx": { "cash": -40, "val": 60 } }] },
+      { "id": "p_ethics", "t": "伦理质询", "d": "一位受试者家属写来长信。", "opts": [{ "l": "公开数据", "fx": { "fame": 3, "val": -20 }, "lean": "clean" }, { "l": "冷处理", "fx": { "fame": -1 }, "lean": "gray", "ledger": { "t": "受试者投诉", "fx": { "cash": -40, "fame": -10 } } }] },
+      { "id": "p_inspect", "k": "crisis", "t": "飞行检查", "d": "检查组没打招呼就到了。", "lvl": 1, "fx": { "cash": -50 } },
       { "id": "p_side", "k": "crisis", "t": "不良反应报告", "d": "几例严重不良反应被上报。", "lvl": 2, "fx": { "cash": -40, "fame": -12 } },
-      { "id": "p_inspect", "k": "crisis", "t": "飞行检查", "d": "检查组没打招呼就到了。", "lvl": 1, "fx": { "cash": -50 } }
+      { "id": "p_recall", "k": "crisis", "t": "批次召回", "d": "一个批号的含量不对。", "lvl": 2, "fx": { "cash": -80, "fame": -8 } }
     ],
     "consumer": [
       { "id": "c_viral", "t": "单品走红", "d": "一条短视频让仓库清空。", "fx": { "cash": 70, "fame": 3 }, "w": 4 },
+      { "id": "c_trend", "t": "国潮风起", "d": "老包装突然成了新时髦。", "fx": { "val": 50, "fame": 2 }, "w": 3 },
       { "id": "c_shelf", "t": "渠道扩张", "d": "连锁商超开出了进场条件。", "opts": [{ "l": "铺货", "fx": { "cash": -50, "val": 70 } }, { "l": "观望", "fx": {} }] },
+      { "id": "c_festival", "t": "购物节", "d": "对手的折扣海报已经贴满地铁。", "opts": [{ "l": "全场大促", "fx": { "cash": 90, "val": -25 } }, { "l": "守住价格", "fx": { "fame": 2 } }] },
       { "id": "c_quality", "k": "crisis", "t": "质量投诉", "d": "投诉帖被顶上热门。", "lvl": 1, "fx": { "fame": -8 } },
-      { "id": "c_boycott", "k": "crisis", "t": "抵制风波", "d": "一句广告词惹了众怒。", "lvl": 2, "fx": { "cash": -50, "fame": -10, "acc": { "$all": -4 } } }
+      { "id": "c_fake", "k": "crisis", "t": "仿冒泛滥", "d": "假货比真货卖得还好。", "lvl": 1, "fx": { "cash": -40, "val": -20 } },
+      { "id": "c_boycott", "k": "crisis", "t": "抵制风波", "d": "一句广告词惹了众怒。", "lvl": 2, "fx": { "cash": -50, "fame": -10, "acc": { "$all": -4 } } },
+      { "id": "c_safety", "k": "crisis", "t": "食品安全事故", "d": "医院里躺着十几个吃过你家产品的人。", "lvl": 3, "p": 4, "fx": { "cash": -100, "fame": -16, "acc": { "$all": -4 } } }
     ]
   },
+  "lean": [
+    { "id": "x_people", "when": { "lean": { "people": 2 } }, "t": "老员工联名信", "d": "他们说，愿意降薪陪公司过这一关。", "fx": { "cash": 60, "fame": 3 }, "w": 4 },
+    { "id": "x_profit", "when": { "lean": { "profit": 2 } }, "t": "核心团队出走", "d": "猎头只用了一句话：那里不拿人当数字。", "fx": { "val": -50, "fame": -2 }, "w": 4 },
+    { "id": "x_clean", "when": { "lean": { "clean": 2 } }, "t": "监管白名单", "d": "检查组这次没进门，只留了一张名片。", "fx": { "shield": 10, "fame": 3 }, "w": 4 },
+    { "id": "x_gray", "when": { "lean": { "gray": 2 } }, "k": "crisis", "t": "调查记者盯上你", "d": "有人在翻你这两年的每一笔账。", "lvl": 2, "fx": { "cash": -50, "fame": -10 } },
+    { "id": "x_family", "when": { "lean": { "family": 2 } }, "t": "一顿安稳的晚饭", "d": "没有人提公司的事。第二天你醒得很早。", "fx": { "ap": 1, "fame": 1 } },
+    { "id": "x_work", "when": { "lean": { "work": 2 } }, "t": "体检报告", "d": "医生把报告推过来：你该停一停了。", "opts": [{ "l": "歇一天", "fx": { "ap": -2 } }, { "l": "硬撑", "fx": { "val": 20 }, "ledger": { "t": "创始人病倒", "fx": { "val": -80, "fame": -4 } } }] }
+  ],
   "life": [
     { "id": "l_visit", "t": "旧同事来访", "d": "带了一瓶酒，和一些公司里的闲话。", "fx": { "fame": 2 } },
     { "id": "l_talk", "t": "讲座邀约", "d": "商学院请你去讲讲失败。", "opts": [{ "l": "去", "fx": { "cash": 30, "fame": 1 } }, { "l": "不去", "fx": {} }] },
@@ -44,6 +75,10 @@
     { "id": "m_wave", "t": "新一轮技术浪潮", "fx": { "boom": { "tech": 9 }, "reg": { "tech": 4 } } },
     { "id": "m_health", "t": "公共卫生预算扩张", "fx": { "boom": { "pharma": 8 } } },
     { "id": "m_trade", "t": "贸易摩擦升级", "fx": { "boom": { "tech": -5, "consumer": -3 }, "stab": { "delta": -6 } } },
-    { "id": "m_ease", "t": "信贷宽松", "fx": { "boom": { "tech": 4, "pharma": 3, "consumer": 4 } } }
+    { "id": "m_ease", "t": "信贷宽松", "fx": { "boom": { "tech": 4, "pharma": 3, "consumer": 4 } } },
+    { "id": "m_green", "t": "环保新政落地", "fx": { "reg": { "tech": 3, "pharma": 5, "consumer": 5 }, "acc": { "$all": 2 } } },
+    { "id": "m_ship", "t": "航运受阻", "fx": { "boom": { "consumer": -5, "pharma": -2 }, "stab": { "north": -4 } } },
+    { "id": "m_talent", "t": "人才回流潮", "fx": { "boom": { "tech": 5, "pharma": 3 } } },
+    { "id": "m_aging", "t": "老龄化白皮书发布", "fx": { "boom": { "pharma": 6, "consumer": -2 } } }
   ]
 }

@@ -1,6 +1,14 @@
 [
   { "id": "d_family", "t": "重要决策日，家里有急事", "d": "董事们已经坐进会议室，手机在桌上震个不停。", "opts": [{ "l": "回家", "fx": { "cash": -30, "fame": -1 }, "lean": "family" }, { "l": "留下", "fx": { "val": 30 }, "lean": "work" }] },
+  { "id": "d_child", "t": "毕业典礼撞上路演", "d": "投资人只在今天有空，礼堂的座位也只留到今天。", "opts": [{ "l": "去礼堂", "fx": { "val": -20, "fame": 1 }, "lean": "family" }, { "l": "去路演", "fx": { "cash": 80 }, "lean": "work" }] },
+  { "id": "d_night", "t": "凌晨三点的电话", "d": "系统告急，值班的人说他们能扛。", "opts": [{ "l": "亲自去", "fx": { "val": 20, "ap": -1 }, "lean": "work" }, { "l": "相信他们", "fx": { "cash": -30 }, "lean": "family" }] },
   { "id": "d_whistle", "t": "下属举报上级造假", "d": "证据就在你邮箱里，只有你看过。", "opts": [{ "l": "彻查", "fx": { "cash": -50, "fame": 5 }, "lean": "clean" }, { "l": "压下", "fx": { "val": 20 }, "lean": "gray", "ledger": { "t": "数据造假旧案", "fx": { "cash": -60, "fame": -10 } } }] },
+  { "id": "d_tip", "t": "一条内幕消息", "d": "饭局散场时，有人在你耳边报了一个代码。", "opts": [{ "l": "买入", "fx": { "cash": 90 }, "lean": "gray", "ledger": { "t": "内幕交易", "fx": { "cash": -120, "fame": -12 } } }, { "l": "当没听见", "fx": { "fame": 2 }, "lean": "clean" }] },
+  { "id": "d_rival", "t": "对手的黑料送上门", "d": "一个匿名信封，里面的东西够同行难看很久。", "opts": [{ "l": "递给记者", "fx": { "val": 40, "fame": -2, "boom": { "$self": -3 } }, "lean": "gray" }, { "l": "锁进抽屉", "fx": { "fame": 2 }, "lean": "clean" }] },
+  { "id": "d_pollute", "t": "环评不过，工期在即", "d": "排污口再改要两个月，夜里放水没人看得见。", "opts": [{ "l": "停工整改", "fx": { "cash": -60, "acc": { "$all": 2 } }, "lean": "clean" }, { "l": "夜里放水", "fx": { "val": 30 }, "lean": "gray", "ledger": { "t": "夜间偷排", "fx": { "cash": -90, "fame": -12, "acc": { "$all": -5 } } } }] },
   { "id": "d_layoff", "t": "裁员保利润", "d": "财务总监把名单放在你桌上。", "opts": [{ "l": "裁", "fx": { "cash": 80, "fame": -6, "stab": { "$all": -2 }, "acc": { "$all": -2 } }, "lean": "profit" }, { "l": "不裁", "fx": { "cash": -40, "fame": 3, "acc": { "$all": 1 } }, "lean": "people" }, { "l": "再拖一拖", "fx": { "fame": -2 } }] },
-  { "id": "d_friend", "t": "老友借钱周转", "d": "他当年帮过你，现在开口了。", "opts": [{ "l": "借", "fx": { "cash": -60, "fame": 2 }, "lean": "people" }, { "l": "婉拒", "fx": { "fame": -1 }, "lean": "profit" }] }
+  { "id": "d_friend", "t": "老友借钱周转", "d": "他当年帮过你，现在开口了。", "opts": [{ "l": "借", "fx": { "cash": -60, "fame": 2 }, "lean": "people" }, { "l": "婉拒", "fx": { "fame": -1 }, "lean": "profit" }] },
+  { "id": "d_village", "t": "征地：最后一户不肯搬", "d": "老人坐在门槛上，推土机停在五十米外。", "opts": [{ "l": "改线绕开", "fx": { "cash": -50, "acc": { "$all": 2 } }, "lean": "people" }, { "l": "按期推进", "fx": { "val": 40, "acc": { "$all": -3 }, "stab": { "$all": -2 } }, "lean": "profit" }] },
+  { "id": "d_veteran", "t": "老臣犯了大错", "d": "他跟了你十年，这次的窟窿不小。", "opts": [{ "l": "保他", "fx": { "cash": -50 }, "lean": "people" }, { "l": "请他走", "fx": { "cash": 20, "fame": -2 }, "lean": "profit" }] },
+  { "id": "d_offer", "t": "有人想买下你的公司", "d": "报价很体面，条件是你让出一把椅子。", "opts": [{ "l": "卖一部分", "fx": { "cash": 220, "control": -10 }, "lean": "profit" }, { "l": "送客", "fx": { "fame": 2 }, "lean": "work" }] }
 ]

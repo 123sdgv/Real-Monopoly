@@ -1,8 +1,8 @@
-// 底部弹层：事件、卡牌、公司、世界、对手、谈判。
+// 底部弹层：事件、卡牌、公司、世界、对手、谈判、图例。
 import { icon } from './icons.js';
-import { chips, cardHTML } from './handView.js';
+import { chips, cardHTML, scale } from './handView.js';
 import { cardOf, statusOk } from '../engine/cards.js';
-import { income, netWorth, npcWorth, valuation } from '../engine/company.js';
+import { harm, income, loanRate, netWorth, npcWorth, valuation } from '../engine/company.js';
 import { chipsOf, dealErr, needOf, personOf } from '../engine/negotiate.js';
 import { mergePrice } from '../engine/npc.js';
 import { caresOf } from '../engine/news.js';
@@ -20,12 +20,12 @@ export function eventSheet(s, data) {
   return `<h3>${icon(KIND[pe.k])}${pe.t}${pe.k === 'crisis' ? `<em class="num">Lv${pe.lvl}</em>` : ''}${
     r ? `<em>${icon(s.world.regions[r.id].industry)}${icon('ind')}<span class="num">${p.sites[r.id]}</span></em>` : ''}</h3>
   ${pe.d ? `<p class="desc">${pe.d}</p>` : ''}
-  ${pe.k === 'crisis' ? `<p class="fx">${icon('end')}${chips(pe.fx, data)}</p>` : ''}
+  ${pe.k === 'crisis' ? `<p class="fx">${icon('end')}${chips(scale(pe.fx, harm(s, data)), data)}</p>` : ''}
   ${pe.k === 'vote' ? `<div class="meter"><i class="${pe.ok ? '' : 'neg'}" style="width:${pe.n}%"></i><b></b></div>
     <p class="fx big ${pe.ok ? 'pos' : 'neg'}"><span class="num">${pe.n}%</span>${icon(pe.ok ? 'worth' : 'out')}</p>` : ''}
   <div class="opts">${pe.opts.map((o, i) => {
     const no = pe.opts.length > 1 && o.fx?.cash < 0 && p.cash < -o.fx.cash;
-    return `<button data-act="choose" data-i="${i}" ${off(!no)}>${OPT[o.l] ? icon(OPT[o.l]) : `<b>${o.l}</b>`}<span class="fx">${chips(o.fx, data)}</span></button>`;
+    return `<button data-act="choose" data-i="${i}" ${off(!no)}>${OPT[o.l] ? icon(OPT[o.l]) : `<b>${o.l}</b>`}<span class="fx">${chips(o.fx, data, 0, o)}</span></button>`;
   }).join('')}</div>`;
 }
 
@@ -53,7 +53,7 @@ export function companySheet(s, data) {
   return `<h3>${icon(p.industry)}${p.name}<em>${p.listed ? icon('ipo') : ''}${icon(STATUS[p.status])}</em></h3>
   ${row('worth', '身价', netWorth(s, data))}
   ${p.status === 'out' ? '' : row('val', '估值', valuation(s, data)) + row('control', p.listed ? '持股' : '话事权', p.control + '%', p.control < c.vote.risk ? 'neg' : '')}
-  ${row('day', '日入', income(s, data))}${row('debt', '债务', p.debt, p.debt ? 'neg' : '')}
+  ${row('inc', '日入', income(s, data))}${row('debt', '债务', p.debt, p.debt ? 'neg' : '')}
   ${p.status === 'ceo' ? row('ledger', '暗账', s.ledger.length) : ''}${p.shield >= s.day ? row('shield', '合规', p.shield - s.day + 1) : ''}
   ${p.status === 'out' ? '' : `<div class="row"><span>${icon('user')}${rep.name}</span>${trust}</div>`}
   ${p.status !== 'ceo' ? '' : data.regions.map((r, i) => `<div class="row"><span class="tag r${i}">${icon('reg')}${r.name}</span><span>${icon(s.world.regions[r.id].industry)}</span>
@@ -62,14 +62,14 @@ export function companySheet(s, data) {
   <div class="opts row">${p.status === 'ceo' ? deal('ipo', '上市', p.listed ? '' : `<span class="chip">${icon('val')}${c.ipo.min}</span>`) + deal('loan', '贷款')
     : p.status === 'holder' ? share(-1) + share(1) + deal('retake', '夺回') : ''}</div>
   <div class="opts row menu">
-    <button data-act="export">${icon('save')}</button><button data-act="import">${icon('load')}</button><button data-act="quit">${icon('stab')}</button>
+    <button data-act="help" aria-label="图例" title="图例">${icon('q')}</button><button data-act="export" aria-label="导出存档" title="导出存档">${icon('save')}</button><button data-act="import" aria-label="导入存档" title="导入存档">${icon('load')}</button><button data-act="quit" aria-label="放弃这一局" title="放弃这一局">${icon('stab')}</button>
   </div><p class="seed num">seed ${s.seed}</p>`;
 }
 
 export function worldSheet(s, data) {
   const p = s.player, W = s.world, can = s.phase === 'act' && s.ap > 0;
   const bar = (ic, v, hot) => `<span class="mtr ${hot ? 'hot' : ''}">${icon(ic)}<i><b style="width:${v}%"></b></i></span>`;
-  const go = (P, d) => `<button class="go" data-act="nego" data-who="${P.id}" data-deal="${d}" ${off(can && !dealErr(s, data, P, d))}>${icon('deal')}</button>`;
+  const go = (P, d) => `<button class="go" data-act="nego" data-who="${P.id}" data-deal="${d}" aria-label="找${P.name}谈" title="找${P.name}谈" ${off(can && !dealErr(s, data, P, d))}>${icon('deal')}</button>`;
   const regions = data.regions.map((r, i) => {
     const w = W.regions[r.id], pol = s.policies.reduce((a, x) => (x.r === r.id && x.until >= s.day ? a * x.v : a), 1);
     return `<div class="wrow"><span class="tag r${i}">${icon(w.industry)}${r.name}</span>
@@ -91,7 +91,7 @@ export function worldSheet(s, data) {
   ${s.rewrites.length ? `<h4>${icon('pen')}${s.rewrites.length}</h4>${rewrites(s)}` : ''}`;
 }
 
-export const rewrites = (s, old) => `<ol class="rew">${(old ? s.rewrites : s.rewrites.slice().reverse()).map(r => `<li><span class="num">${r.day}</span>${r.title}</li>`).join('')}</ol>`;
+const rewrites = s => `<ol class="rew">${s.rewrites.slice().reverse().map(r => `<li><span class="num">${r.day}</span>${r.title}</li>`).join('')}</ol>`;
 
 export function npcSheet(s, data, id) {
   const d = data.npcs.find(x => x.id === id), n = s.npcs[id], p = s.player, c = data.config;
@@ -101,11 +101,11 @@ export function npcSheet(s, data, id) {
   const left = (ic, day, cls) => (day >= s.day ? `<span class="chip ${cls}">${icon(ic)}${day - s.day + 1}</span>` : '');
   const btn = (attrs, ok, ic, label, right) => `<button ${attrs} ${off(can && ok)}><span>${icon(ic)}${label}</span><span class="fx">${right}${icon('ap')}</span></button>`;
   return `<h3>${icon(d.industry)}${d.name}<em>${n.listed ? icon('ipo') : ''}${icon('worth')}<span class="num">${w}</span></em></h3>
-  <p class="fx">${icon('control')}<span class="num">${p.stake[id]}%</span>${left('ally', n.ally, 'pos')}${left('down', n.war, 'neg')}${sh ? left('short', sh.due, '') : ''}</p>
+  <p class="fx">${icon('control')}<span class="num">${p.stake[id]}%</span>${n.listed ? '' : '<span class="chip dim">未上市</span>'}${left('ally', n.ally, 'pos')}${left('down', n.war, 'neg')}${sh ? left('short', sh.due, '') : ''}</p>
   <div class="opts">
-    ${btn(`data-act="stake" data-id="${id}" data-n="1"`, p.stake[id] + k <= c.stock.max && p.cash >= cost, 'plus', k + '%', chips({ cash: -cost }, data))}
+    ${btn(`data-act="stake" data-id="${id}" data-n="1"`, n.listed && p.stake[id] + k <= c.stock.max && p.cash >= cost, 'plus', k + '%', chips({ cash: -cost }, data))}
     ${btn(`data-act="stake" data-id="${id}" data-n="-1"`, p.stake[id] >= k, 'minus', k + '%', chips({ cash: Math.round(per) }, data))}
-    ${btn(`data-act="short" data-id="${id}"`, !sh && p.cash >= c.short.size, 'short', '做空', chips({ cash: -c.short.size }, data))}
+    ${btn(`data-act="short" data-id="${id}"`, n.listed && !sh && p.cash >= c.short.size, 'short', '做空', chips({ cash: -c.short.size }, data))}
     ${btn(`data-act="nego" data-who="${X.id}" data-deal="ally"`, !dealErr(s, data, X, 'ally'), 'ally', '结盟', icon('deal'))}
     ${btn(`data-act="nego" data-who="rep" data-deal="merge" data-arg="${id}"`, !dealErr(s, data, rep, 'merge', id), 'merge', '并购', chips({ cash: -mergePrice(s, data, id) }, data) + icon('deal'))}
   </div>`;
@@ -120,7 +120,7 @@ export function negoSheet(s, data, sh) {
   const gain = {
     lobby: () => `${icon('ind')}${icon('up')}${span('lobby', '%')}${days('lobby')}`,
     ipo: () => chips({ cash: Math.round(valuation(s, data) * c.ipo.raise), control: Math.round(p.control * c.ipo.keep) - p.control, val: Math.round(valuation(s, data) * c.ipo.pop) }, data),
-    loan: () => `${icon('cash')}+${span('loan')}${icon('debt')}×${c.loan.rate}`,
+    loan: () => `${icon('cash')}+${span('loan')}${icon('debt')}×${loanRate(s, data).toFixed(2)}`,
     merge: () => chips({ cash: -mergePrice(s, data, sh.arg) }, data) + icon('merge'),
     retake: () => icon('worth'),
     ally: () => `${icon('cash')}${icon('up')}${span('ally', '%')}${days('ally')}`,
@@ -136,3 +136,16 @@ export function negoSheet(s, data, sh) {
   <div class="chips">${all.map(chip).join('')}</div>
   <button class="primary wide" data-act="deal" ${off(sh.pick.length && s.phase === 'act' && s.ap > 0 && !dealErr(s, data, P, sh.deal, sh.arg))}>${icon('deal')}${icon('ap')}</button>`;
 }
+
+// 图例：每个图标两三个字，不在别处重复解释
+const KEY = [
+  ['一天', [['paper', '读报'], ['rest', '掷骰走格'], ['gen', '事件'], ['draw', '抽牌'], ['ap', '行动点'], ['end', '入夜结算']]],
+  ['公司', [['cash', '现金'], ['control', '控制权'], ['fame', '名声'], ['worth', '身价'], ['val', '估值'], ['inc', '日入'], ['debt', '债务'], ['ipo', '已上市']]],
+  ['棋盘', [['rest', '休息'], ['gen', '通用事件'], ['ind', '行业 / 厂区'], ['reg', '地区'], ['dil', '抉择'], ['warn', '危机']]],
+  ['牌', [['pr', '公关'], ['fin', '融资'], ['ops', '运营'], ['net', '人脉'], ['hole', '底牌'], ['wild', '万能'], ['ok', '化解'], ['ledger', '压下，进暗账'], ['shield', '合规天数'], ['eye', '情报']]],
+  ['世界', [['stab', '政治稳定'], ['acc', '企业接纳'], ['law', '监管压力'], ['up', '景气涨'], ['down', '景气跌'], ['ban', '禁入'], ['pen', '因你而变']]],
+  ['谈判', [['deal', '开谈'], ['job', '就业'], ['green', '环保'], ['fame', '面子'], ['cash', '利益'], ['control', '股权'], ['net', '人情'], ['q', '还没摸清']]],
+  ['对手', [['plus', '买入'], ['minus', '卖出'], ['short', '做空'], ['ally', '结盟'], ['merge', '并购']]],
+];
+export const helpSheet = () => `<h3>${icon('q')}图例</h3>${KEY.map(([t, list]) =>
+  `<h4>${t}</h4><div class="key">${list.map(([ic, l]) => `<span>${icon(ic)}${l}</span>`).join('')}</div>`).join('')}`;

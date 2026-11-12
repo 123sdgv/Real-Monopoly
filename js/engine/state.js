@@ -1,9 +1,9 @@
 // 状态定义与初始化。整个状态是纯 JSON，可直接存档。
 import { makePaper } from './paper.js';
-import { npcWorth } from './company.js';
+import { netWorth, npcWorth } from './company.js';
 import { caresOf } from './news.js';
 
-export const VERSION = 2;
+export const VERSION = 3;
 
 export function newGame(data, seed, opts = {}) {
   const c = data.config;
@@ -21,6 +21,8 @@ export function newGame(data, seed, opts = {}) {
     ledger: [], queue: [], rewrites: [],
     // P2/P3：世界事件标记、玩家对各变量的累计推动、限时政策、空单、已看穿的标签、股东代表的信任、当晚重大负面数
     flags: {}, push: {}, policies: [], shorts: [], known: {}, trust: 0, strike: 0,
+    // P4：近期出过的事件、身份轨迹 [身份, 天]、身价峰值 [数值, 天]，结算页要用
+    seen: {}, path: [['ceo', 1]], peak: [0, 1], me: null,
     npcs: {},
     news: [{ k: 'open', w: 9, mine: true }],
     world: { regions: {}, industries: {} },
@@ -37,6 +39,7 @@ export function newGame(data, seed, opts = {}) {
     s.player.stake[n.id] = 0;
   }
   for (const P of data.people) s.known[P.id] = caresOf(data, P).slice(0, P.open);
+  s.me = { inc: 0, worth: netWorth(s, data), d: 0 };
   s.paper = makePaper(s, data);
   s.news = [];
   return s;
