@@ -7,7 +7,7 @@ export const serialize = s => JSON.stringify(s);
 
 export function parse(text) {
   const s = JSON.parse(text);
-  if (!s || s.v !== VERSION || !s.player || !s.world || !Number.isInteger(s.rng)) throw new Error('bad save');
+  if (!s || s.v !== VERSION || !s.player || !s.world || !s.npcs || !Number.isInteger(s.rng)) throw new Error('bad save');
   return s;
 }
 

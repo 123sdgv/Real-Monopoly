@@ -243,6 +243,7 @@ js/
     cards.js      筛选引擎、抽牌、出牌
     events.js     格子事件、抉择、宏观事件
     world.js      世界变量、阈值、世界事件
+    news.js       定稿新闻、"因你而变"记录
     paper.js      报纸生成
     npc.js        NPC 行为
     company.js    估值、上市、董事会、身份流转
@@ -253,6 +254,7 @@ js/
 data/
   cards.json  events.json  dilemmas.json  regions.json
   industries.json  npcs.json  headlines.json  config.json
+  world.json（世界事件）  people.json（谈判对象）
 test/
   sim.mjs         无界面跑 1000 局，检查不崩、检查胜率和平均局长
 ```

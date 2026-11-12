@@ -1,0 +1,10 @@
+[
+  { "id": "off_north", "kind": "official", "region": "north", "name": "罗署长", "role": "北岸招商署", "open": 1, "need": 1, "clue": "任期只剩一年，想留下一块看得见的牌子。" },
+  { "id": "off_delta", "kind": "official", "region": "delta", "name": "梁局长", "role": "三角洲港务局", "open": 1, "need": 1, "clue": "去年的河道污染让他差点丢了位子。" },
+  { "id": "off_highland", "kind": "official", "region": "highland", "name": "纪专员", "role": "高地自治专员", "open": 1, "need": 2, "clue": "高地人不欢迎外来者，除非好处够多。" },
+  { "id": "rep", "kind": "rep", "name": "顾董", "role": "股东代表", "cares": ["money", "face"], "open": 1, "clue": "他只认两样东西：回报，和体面。" },
+  { "id": "x_apex", "kind": "exec", "npc": "apex", "name": "韩总", "role": "奇点科技", "cares": ["power", "money"], "open": 1, "need": 1, "clue": "他从不做没有筹码的生意。" },
+  { "id": "x_kang", "kind": "exec", "npc": "kang", "name": "温总", "role": "康域医药", "cares": ["face", "job"], "open": 1, "need": 1, "clue": "三代人的招牌，比利润要紧。" },
+  { "id": "x_wan", "kind": "exec", "npc": "wan", "name": "金总", "role": "万象消费", "cares": ["money", "favor"], "open": 1, "need": 1, "clue": "今天的朋友，明天的对手盘。" },
+  { "id": "fixer", "kind": "fixer", "name": "老周", "role": "消息灵通", "cares": ["favor", "money"], "open": 1, "need": 1, "clue": "他什么都知道，也什么都记得。" }
+]
