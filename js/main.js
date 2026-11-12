@@ -19,7 +19,7 @@ const clean = t => String(t || '').replace(/[<>&"']/g, '').trim().slice(0, 8);
 const calm = matchMedia('(prefers-reduced-motion: reduce)');
 let data, state = null, sheet = null, timer;
 // 只属于界面的东西：走格动画里棋子的临时位置、骰子在转、刚抽到的牌、哪一天的报纸已经上过墨
-const ui = { pos: null, rolling: false, fresh: [], busy: false, pressed: -1 };
+const ui = { pos: null, rolling: false, fresh: [], busy: false, pressed: -1, arm: false };
 
 function toast(t) {
   const el = $('#toast');
@@ -28,7 +28,8 @@ function toast(t) {
   clearTimeout(timer);
   timer = setTimeout(() => el.classList.remove('on'), 1400);
 }
-const persist = () => { try { state ? save(localStorage, state) : clear(localStorage); } catch {} };
+const store = (() => { try { return localStorage; } catch { return null; } })(); // 有的环境连碰都不让碰
+const persist = () => { try { state ? save(store, state) : clear(store); } catch {} };
 
 function render() {
   const over = state?.phase === 'over', paper = state?.phase === 'paper';
@@ -134,7 +135,10 @@ document.addEventListener('click', ev => {
     case 'deal': dispatch({ type: 'nego', who: sheet.who, deal: sheet.deal, arg: sheet.arg, chips: sheet.pick }, true); break;
     case 'stake': dispatch({ type: 'stake', id: d.id, n: +d.n }, true); break;
     case 'short': dispatch({ type: 'short', id: d.id }, true); break;
-    case 'quit': if (confirm('放弃这一局？')) { sheet = null; dispatch({ type: 'quit' }); } break;
+    case 'quit': // 连点两次才算数，不用系统弹窗
+      if (ui.arm) { ui.arm = false; sheet = null; dispatch({ type: 'quit' }); }
+      else { ui.arm = true; toast('再点一次，放弃这一局'); setTimeout(() => { ui.arm = false; }, 2500); }
+      break;
     case 'close': sheet = null; render(); break;
     case 'export': {
       const a = document.createElement('a');
@@ -170,7 +174,7 @@ $('#file').addEventListener('change', async ev => {
 (async () => {
   try {
     data = Object.fromEntries(await Promise.all(FILES.map(async n => [n, await (await fetch(`data/${n}.json`)).json()])));
-    state = load(localStorage);
+    state = store && load(store);
     render();
   } catch { $('#app').textContent = '数据加载失败'; }
 })();
